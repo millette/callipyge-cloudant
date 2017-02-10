@@ -29,10 +29,10 @@ const reserved = ['_session']
 exports.register = (server, pluginOptions, next) => {
   joi.assert(pluginOptions, pluginSchema, 'Invalid plugin options registering ' + pkg.name)
   server.register(h2o2).then(() => {
-    const proxy = (route, options) => {
+    const cloudant = (route, options) => {
       // FIXME: only auth (bool) is allowed in options
       if (!options) { options = {} }
-      joi.assert(options, proxySchema, 'Invalid proxy handler options in ' + pkg.name)
+      joi.assert(options, proxySchema, 'Invalid cloudant handler options in ' + pkg.name)
       const auth = options.auth
       // FIXME: currently overrides all h2o2 options...
 
@@ -71,8 +71,8 @@ exports.register = (server, pluginOptions, next) => {
       }
       return server.root._handlers.proxy(route, { mapUri, onResponse })
     }
-    const decorate = function (options) { proxy(this.request.route, options)(this.request, this) }
-    server.handler('cloudant', proxy)
+    const decorate = function (options) { cloudant(this.request.route, options)(this.request, this) }
+    server.handler('cloudant', cloudant)
     server.decorate('reply', 'cloudant', decorate)
     next()
   })
