@@ -6,7 +6,8 @@
     "lint": "standard"
   },
   "dependencies": {
-    "h2o2": "^5.4.0"
+    "h2o2": "^5.4.0",
+    "wreck": "^10.0.0"
   },
   "devDependencies": {
     "standard": "^8.6.0"

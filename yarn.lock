@@ -77,6 +77,12 @@ boom@3.X.X, boom@3.x.x:
   dependencies:
     hoek "4.x.x"
 
+boom@4.x.x:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/boom/-/boom-4.2.0.tgz#c1a74174b11fbba223f6162d4fd8851a1b82a536"
+  dependencies:
+    hoek "4.x.x"
+
 brace-expansion@^1.0.0:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/brace-expansion/-/brace-expansion-1.1.6.tgz#7197d7eaa9b87e648390ea61fc66c84427420df9"
@@ -948,6 +954,13 @@ wreck@9.X.X:
   resolved "https://registry.yarnpkg.com/wreck/-/wreck-9.0.0.tgz#1de63d49bb07b94fe718864b8be63176e63331ec"
   dependencies:
     boom "3.x.x"
+    hoek "4.x.x"
+
+wreck@^10.0.0:
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/wreck/-/wreck-10.0.0.tgz#98ab882f85e16a526332507f101f5a7841162278"
+  dependencies:
+    boom "4.x.x"
     hoek "4.x.x"
 
 write@^0.2.1:
