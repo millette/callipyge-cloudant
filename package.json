@@ -1,0 +1,14 @@
+{
+  "name": "callipyge-cloudant",
+  "version": "0.0.0",
+  "main": "index.js",
+  "scripts": {
+    "lint": "standard"
+  },
+  "dependencies": {
+    "h2o2": "^5.4.0"
+  },
+  "devDependencies": {
+    "standard": "^8.6.0"
+  }
+}
