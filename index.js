@@ -18,11 +18,11 @@ exports.register = (server, pluginOptions, next) => server.register(h2o2)
           const urlObject = url.parse(`https://${pluginOptions.username}.cloudant.com/${pluginOptions.dbName}/`)
           if (auth) { urlObject.auth = [pluginOptions.username, pluginOptions.password].join(':') }
 
-          if (request.params.afterdb) {
-            if (reserved.indexOf(request.params.afterdb) !== -1) {
-              request.params.afterdb = '/' + request.params.afterdb
+          if (request.params.cloudant) {
+            if (reserved.indexOf(request.params.cloudant) !== -1) {
+              request.params.cloudant = '/' + request.params.cloudant
             }
-            urlObject.pathname = url.resolve(urlObject.pathname, request.params.afterdb)
+            urlObject.pathname = url.resolve(urlObject.pathname, request.params.cloudant)
           }
           urlObject.query = Object.assign({}, request.query)
           delete urlObject.query.only
