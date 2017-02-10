@@ -31,8 +31,9 @@ exports.register = (server, pluginOptions, next) => {
   server.register(h2o2).then(() => {
     const proxy = (route, options) => {
       // FIXME: only auth (bool) is allowed in options
+      if (!options) { options = {} }
       joi.assert(options, proxySchema, 'Invalid proxy handler options in ' + pkg.name)
-      const auth = options && options.auth
+      const auth = options.auth
       // FIXME: currently overrides all h2o2 options...
 
       const mapUri = function (request, callback) {
