@@ -6,7 +6,7 @@ const url = require('url')
 // npm
 const h2o2 = require('h2o2')
 const wreck = require('wreck')
-const joi = require('joi');
+const joi = require('joi')
 
 // self
 const pkg = require('./package.json')
