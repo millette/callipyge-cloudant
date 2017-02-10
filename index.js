@@ -12,43 +12,39 @@ const reserved = ['_session']
 exports.register = (server, pluginOptions, next) => server.register(h2o2)
   .then(() => {
     const proxy = (route, options) => {
-      if (!options) { options = {} }
-
-      const urlObject = url.parse(`https://${pluginOptions.username}.cloudant.com/${pluginOptions.dbName}/`)
-      if (options.auth) {
-        urlObject.auth = [pluginOptions.username, pluginOptions.password].join(':')
-      }
-
+      const auth = options && options.auth
       options = {
         mapUri: function (request, callback) {
+          const urlObject = url.parse(`https://${pluginOptions.username}.cloudant.com/${pluginOptions.dbName}/`)
+          if (auth) { urlObject.auth = [pluginOptions.username, pluginOptions.password].join(':') }
+
           if (request.params.afterdb) {
             if (reserved.indexOf(request.params.afterdb) !== -1) {
               request.params.afterdb = '/' + request.params.afterdb
             }
             urlObject.pathname = url.resolve(urlObject.pathname, request.params.afterdb)
           }
-          urlObject.query = request.query
-          const dbUrl = url.format(urlObject)
-          // console.log('dbUrl:', dbUrl)
-          // console.log('doing some aditional stuff before redirecting')
-          callback(null, dbUrl, { accept: 'application/json' })
+          urlObject.query = Object.assign({}, request.query)
+          delete urlObject.query.only
+          callback(null, url.format(urlObject), { accept: 'application/json' })
         },
         onResponse: function (err, res, request, reply, settings, ttl) {
-          // console.log('receiving the response from the upstream.', settings, ttl)
           if (err) { return reply(err) }
-          wreck.read(res, { json: true }, function (err, payload) {
-            // console.log('some payload manipulation if you want to.')
-            if (err) { return reply(err) }
-            switch (payload.rows && request.query.only) {
-              case 'docs':
-                payload = payload.rows.map((row) => row.doc || row)
-              break
 
-              case 'rows':
-                payload = payload.rows
-              break
+          wreck.read(res, { json: true }, function (err, payload) {
+            if (err) { return reply(err) }
+            if (res.statusCode < 100 || res.statusCode >= 400) {
+              // FIXME: Might want to keep this header or remove it entirely
+              if (!auth) { delete res.headers['www-authenticate'] }
+            } else if (payload.rows && request.query.only &&
+              (request.query.only === 'docs' || request.query.only === 'rows')) {
+              payload = payload.rows
+              if (request.query.only === 'docs') { payload = payload.map((row) => row.doc || row) }
             }
-            reply(payload).headers = res.headers
+            reply(payload)
+              .code(res.statusCode)
+              .message(res.statusMessage)
+              .headers = res.headers
           })
         }
       }
@@ -64,6 +60,5 @@ exports.register = (server, pluginOptions, next) => server.register(h2o2)
     next()
   })
   .catch(next)
-
 
 exports.register.attributes = { pkg: require('./package.json') }
