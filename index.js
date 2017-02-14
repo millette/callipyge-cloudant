@@ -43,8 +43,6 @@ exports.register = (server, pluginOptions, next) => {
       delete u.auth
     }
     const u2 = url.format(u) + '/'
-    console.log('cloudantPost:', u2, auth, doc)
-    // return { ok: true }
 
     const options = {
       json: true,
@@ -52,8 +50,9 @@ exports.register = (server, pluginOptions, next) => {
       body: JSON.stringify(doc)
     }
     if (auth) { options.auth = auth }
-    console.log('options:', options)
-    return got.post(u2, options).then((x) => x.body)
+    return got.post(u2, options)
+      .then((x) => x.body)
+      .catch((e) => boom.create(e.statusCode, e.statusMessage, e))
   }
 
   server.method('cloudant.post', cloudantPost)
