@@ -30,14 +30,20 @@ const reserved = ['_session']
 exports.register = (server, pluginOptions, next) => {
   joi.assert(pluginOptions, pluginSchema, 'Invalid plugin options registering ' + pkg.name)
 
-  const dbUrl = (auth, obj) => {
+  const dbUrl = (auth) => {
     const urlObject = url.parse(`https://${pluginOptions.username}.cloudant.com/${pluginOptions.dbName}/`)
     if (auth) { urlObject.auth = [pluginOptions.username, pluginOptions.password].join(':') }
-    return obj ? urlObject : url.format(urlObject)
+    return urlObject
   }
 
   const cloudantPost = function (auth, doc) {
-    console.log('cloudantPost:', dbUrl(auth), auth, doc)
+    const u = dbUrl(auth)
+    if (u.auth) {
+      auth = u.auth
+      delete u.auth
+    }
+    const u2 = url.format(u)
+    console.log('cloudantPost:', u2, auth, doc)
     return { ok: true }
   }
 
@@ -52,9 +58,7 @@ exports.register = (server, pluginOptions, next) => {
       // FIXME: currently overrides all h2o2 options...
 
       const mapUri = function (request, callback) {
-        const urlObject = dbUrl(auth, true)
-        // const urlObject = url.parse(`https://${pluginOptions.username}.cloudant.com/${pluginOptions.dbName}/`)
-        // if (auth) { urlObject.auth = [pluginOptions.username, pluginOptions.password].join(':') }
+        const urlObject = dbUrl(auth)
         if (request.params.cloudant) {
           if (reserved.indexOf(request.params.cloudant) !== -1) {
             request.params.cloudant = '/' + request.params.cloudant
