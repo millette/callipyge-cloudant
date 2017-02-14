@@ -6,6 +6,7 @@
     "lint": "standard"
   },
   "dependencies": {
+    "boom": "^4.2.0",
     "got": "^6.7.1",
     "h2o2": "^5.4.0",
     "joi": "^10.2.2",
