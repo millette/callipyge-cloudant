@@ -8,6 +8,7 @@ const h2o2 = require('h2o2')
 const wreck = require('wreck')
 const joi = require('joi')
 const got = require('got')
+const boom = require('boom')
 
 // self
 const pkg = require('./package.json')
@@ -52,7 +53,7 @@ exports.register = (server, pluginOptions, next) => {
     if (auth) { options.auth = auth }
     return got.post(u2, options)
       .then((x) => x.body)
-      .catch((e) => boom.create(e.statusCode, e.statusMessage, e))
+      .catch((e) => boom.wrap(e, e.statusCode))
   }
 
   server.method('cloudant.post', cloudantPost)
