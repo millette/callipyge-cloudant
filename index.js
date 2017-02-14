@@ -48,9 +48,11 @@ exports.register = (server, pluginOptions, next) => {
 
     const options = {
       json: true,
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify(doc)
     }
     if (auth) { options.auth = auth }
+    console.log('options:', options)
     return got.post(u2, options).then((x) => x.body)
   }
 
