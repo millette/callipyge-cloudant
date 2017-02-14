@@ -44,7 +44,14 @@ exports.register = (server, pluginOptions, next) => {
     }
     const u2 = url.format(u)
     console.log('cloudantPost:', u2, auth, doc)
-    return { ok: true }
+    // return { ok: true }
+
+    const options = {
+      json: true,
+      body: JSON.stringify(doc)
+    }
+    if (auth) { options.auth = auth }
+    return got.post(u2. options).then((x) => x.body)
   }
 
   server.method('cloudant.post', cloudantPost)
