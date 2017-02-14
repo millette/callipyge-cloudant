@@ -42,7 +42,7 @@ exports.register = (server, pluginOptions, next) => {
       auth = u.auth
       delete u.auth
     }
-    const u2 = url.format(u)
+    const u2 = url.format(u) + '/'
     console.log('cloudantPost:', u2, auth, doc)
     // return { ok: true }
 
