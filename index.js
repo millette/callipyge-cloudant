@@ -7,6 +7,7 @@ const url = require('url')
 const h2o2 = require('h2o2')
 const wreck = require('wreck')
 const joi = require('joi')
+// const got = require('got')
 
 // self
 const pkg = require('./package.json')
@@ -28,6 +29,20 @@ const reserved = ['_session']
 
 exports.register = (server, pluginOptions, next) => {
   joi.assert(pluginOptions, pluginSchema, 'Invalid plugin options registering ' + pkg.name)
+
+  const dbUrl = (auth, obj) => {
+    const urlObject = url.parse(`https://${pluginOptions.username}.cloudant.com/${pluginOptions.dbName}/`)
+    if (auth) { urlObject.auth = [pluginOptions.username, pluginOptions.password].join(':') }
+    return obj ? urlObject : url.format(urlObject)
+  }
+
+  const cloudantPost = function (auth, doc) {
+    console.log('cloudantPost:', dbUrl(auth), auth, doc)
+    return { ok: true }
+  }
+
+  server.method('cloudant.post', cloudantPost)
+
   server.register(h2o2).then(() => {
     const cloudant = (route, options) => {
       // FIXME: only auth (bool) is allowed in options
@@ -37,8 +52,9 @@ exports.register = (server, pluginOptions, next) => {
       // FIXME: currently overrides all h2o2 options...
 
       const mapUri = function (request, callback) {
-        const urlObject = url.parse(`https://${pluginOptions.username}.cloudant.com/${pluginOptions.dbName}/`)
-        if (auth) { urlObject.auth = [pluginOptions.username, pluginOptions.password].join(':') }
+        const urlObject = dbUrl(auth, true)
+        // const urlObject = url.parse(`https://${pluginOptions.username}.cloudant.com/${pluginOptions.dbName}/`)
+        // if (auth) { urlObject.auth = [pluginOptions.username, pluginOptions.password].join(':') }
         if (request.params.cloudant) {
           if (reserved.indexOf(request.params.cloudant) !== -1) {
             request.params.cloudant = '/' + request.params.cloudant
