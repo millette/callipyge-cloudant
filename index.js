@@ -7,7 +7,7 @@ const url = require('url')
 const h2o2 = require('h2o2')
 const wreck = require('wreck')
 const joi = require('joi')
-// const got = require('got')
+const got = require('got')
 
 // self
 const pkg = require('./package.json')
@@ -51,7 +51,7 @@ exports.register = (server, pluginOptions, next) => {
       body: JSON.stringify(doc)
     }
     if (auth) { options.auth = auth }
-    return got.post(u2. options).then((x) => x.body)
+    return got.post(u2, options).then((x) => x.body)
   }
 
   server.method('cloudant.post', cloudantPost)
