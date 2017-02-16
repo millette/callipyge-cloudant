@@ -2,6 +2,15 @@
   "name": "callipyge-cloudant",
   "version": "0.1.0",
   "main": "index.js",
+  "engines": {
+    "node": ">=6"
+  },
+  "repository": "millette/callipyge-cloudant",
+  "author": {
+    "name": "Robin Millette",
+    "email": "robin@millette.info",
+    "url": "http://robin.millette.info"
+  },
   "scripts": {
     "lint": "standard"
   },
