@@ -37,7 +37,7 @@ exports.register = (server, pluginOptions, next) => {
     return urlObject
   }
 
-  const cloudantPost = function (auth, doc) {
+  const cloudantPost = function (doc, auth) {
     const u = dbUrl(auth)
     if (u.auth) {
       auth = u.auth
