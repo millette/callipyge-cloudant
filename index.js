@@ -31,6 +31,35 @@ const reserved = ['_session']
 exports.register = (server, pluginOptions, next) => {
   joi.assert(pluginOptions, pluginSchema, 'Invalid plugin options registering ' + pkg.name)
 
+  const getDoc = function (request, reply) {
+    if (!request.params.docid && !request.query.from) { return reply({}) }
+
+    reply(
+      request.server.inject({ allowInternals: true, url: ['', 'cloudant.private', request.params.docid || request.query.from].join('/') })
+        .then((a) => {
+          if (a.statusCode <= 100 || a.statusCode >= 400) {
+            return boom.create(a.statusCode, a.result.reason, a.result)
+          }
+          if (request.query.from) {
+            delete a.result._id
+            delete a.result._rev
+            a.result.title = 'Copy of ' + a.result.title
+          }
+          return a.result
+        })
+    )
+  }
+
+  const getAllDocs = function (request, reply) {
+    reply(
+      request.server.inject({ allowInternals: true, url: '/cloudant.private/_all_docs?include_docs=true&only=docs' })
+        .then((a) => a.statusCode > 100 && a.statusCode < 400
+          ? a.result
+          : boom.create(a.statusCode, a.result.reason, a.result)
+        )
+    )
+  }
+
   const dbUrl = (auth) => {
     const urlObject = url.parse(`https://${pluginOptions.username}.cloudant.com/${pluginOptions.dbName}/`)
     if (auth) { urlObject.auth = [pluginOptions.username, pluginOptions.password].join(':') }
@@ -57,6 +86,8 @@ exports.register = (server, pluginOptions, next) => {
   }
 
   server.method('cloudant.post', cloudantPost)
+  server.method('cloudant.getDoc', getDoc)
+  server.method('cloudant.getAllDocs', getAllDocs)
 
   server.register(h2o2).then(() => {
     const cloudant = (route, options) => {
@@ -103,6 +134,25 @@ exports.register = (server, pluginOptions, next) => {
     const decorate = function (options) { cloudant(this.request.route, options)(this.request, this) }
     server.handler('cloudant', cloudant)
     server.decorate('reply', 'cloudant', decorate)
+
+    server.route([
+      {
+        // FIXME: should handle any http method but h2o2 complains
+        method: 'get',
+        path: '/cloudant.public/{cloudant*}',
+        handler: { cloudant: false },
+        config: { isInternal: true }
+      },
+
+      {
+        // FIXME: should handle any http method but h2o2 complains
+        method: 'get',
+        path: '/cloudant.private/{cloudant*}',
+        handler: { cloudant: { auth: true } },
+        config: { isInternal: true }
+      }
+    ])
+
     next()
   })
   .catch(next)
