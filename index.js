@@ -60,7 +60,7 @@ exports.register = (server, pluginOptions, next) => {
     reply(
       request.server.inject({ allowInternals: true, url: '/cloudant.private/_all_docs?include_docs=true&only=docs' })
         .then((a) => a.statusCode > 100 && a.statusCode < 400
-          ? a.result
+          ? a.result.map(pluginOptions.transform)
           : boom.create(a.statusCode, a.result.reason, a.result)
         )
     )
