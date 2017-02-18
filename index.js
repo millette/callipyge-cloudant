@@ -13,7 +13,10 @@ const boom = require('boom')
 // self
 const pkg = require('./package.json')
 
+const defaultTransform = (doc) => doc
+
 const pluginSchema = joi.object({
+  transform: joi.func().arity(1),
   username: joi.string().required(),
   password: joi.string().required(),
   dbName: joi.string().required()
@@ -29,6 +32,8 @@ const proxySchema = joi.object({
 const reserved = ['_session']
 
 exports.register = (server, pluginOptions, next) => {
+  if (!pluginOptions) { pluginOptions = {} }
+  if (!pluginOptions.transform) { pluginOptions.transform = defaultTransform }
   joi.assert(pluginOptions, pluginSchema, 'Invalid plugin options registering ' + pkg.name)
 
   const getDoc = function (request, reply) {
@@ -40,6 +45,7 @@ exports.register = (server, pluginOptions, next) => {
           if (a.statusCode <= 100 || a.statusCode >= 400) {
             return boom.create(a.statusCode, a.result.reason, a.result)
           }
+          a.result = pluginOptions.transform(a.result)
           if (request.query.from) {
             delete a.result._id
             delete a.result._rev
