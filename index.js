@@ -113,46 +113,6 @@ exports.register = (server, pluginOptions, next) => {
   const cloudantPost = exports.cloudantPost.bind(this, dbUrl)
   const cloudantCreateIndex = exports.cloudantCreateIndex.bind(this, dbUrl)
 
-/*
-  const cloudantPost = function (doc, auth) {
-    const u = dbUrl(auth)
-    if (u.auth) {
-      auth = u.auth
-      delete u.auth
-    }
-    const u2 = url.format(u) + '/'
-
-    const options = {
-      json: true,
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(doc)
-    }
-    if (auth) { options.auth = auth }
-    return got.post(u2, options)
-      .then((x) => x.body)
-      .catch((e) => boom.wrap(e, e.statusCode))
-  }
-
-  const cloudantCreateIndex = function (index, auth) {
-    const u = dbUrl(auth)
-    if (u.auth) {
-      auth = u.auth
-      delete u.auth
-    }
-    const u2 = url.format(u) + '/_index'
-
-    const options = {
-      json: true,
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(index)
-    }
-    if (auth) { options.auth = auth }
-    return got.post(u2, options)
-      .then((x) => x.body)
-      .catch((e) => boom.wrap(e, e.statusCode))
-  }
-*/
-
   const cloudantFind = function (query, auth) {
     const u = dbUrl(auth)
     if (u.auth) {
