@@ -239,11 +239,3 @@ exports.register = (server, pluginOptions, next) => {
 }
 
 exports.register.attributes = { pkg }
-
-/*
-exports.register = (server, pluginOptions, next) => {
-}
-
-exports.register = (server, pluginOptions, next) => {
-}
-*/
