@@ -22,6 +22,6 @@
     "wreck": "^10.0.0"
   },
   "devDependencies": {
-    "standard": "^9.0.0"
+    "standard": "^9.0.1"
   }
 }
